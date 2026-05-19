@@ -1,35 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
+
+import { startTransition, useCallback, useEffect, useRef, useState } from "react";
 import { LiveClock } from "./LiveClock";
 import { useCountUp } from "../hooks/useCountUp";
+import type { TaxSummaryResponse } from "../lib/bapenda-contract";
 
-/* ── Types ── */
-interface RincianItem {
-  jenis_pajak: string;
-  target: number;
-  realisasi: number;
-  persentase: number;
-  selisih: number;
-}
+const POLL_INTERVAL_MS = 5_000;
 
-interface Ringkasan {
-  total_target: number;
-  total_realisasi: number;
-  persentase_capaian: number;
-  selisih_anggaran: number;
-}
-
-interface ApiData {
-  tahun: number;
-  ringkasan: Ringkasan;
-  rincian: RincianItem[];
-}
-
-const POLL_INTERVAL_MS = 5_000; // 5 detik
-
-/* ── Helpers ── */
 function formatRupiah(n: number): string {
   return n.toLocaleString("id-ID");
 }
@@ -49,7 +28,6 @@ function getBarColor(persen: number): string {
   return "progress-red";
 }
 
-/* ── AnimatedNumber — shows formatted Rupiah with counter animation ── */
 function AnimatedRupiah({ value }: { value: number }) {
   const animated = useCountUp(value);
   return <>{formatRupiah(animated)}</>;
@@ -61,13 +39,11 @@ function AnimatedMilyar({ value }: { value: number }) {
 }
 
 function AnimatedPercent({ value, decimals = 2 }: { value: number; decimals?: number }) {
-  // Multiply by 100 to keep integer precision, divide back for display
   const scaled = Math.round(value * 100);
   const animated = useCountUp(scaled);
   return <>{(animated / 100).toFixed(decimals)}%</>;
 }
 
-/* ── Progress bar with animated width ── */
 function AnimatedBar({ persen }: { persen: number }) {
   const [width, setWidth] = useState(0);
   const prevPersen = useRef(persen);
@@ -87,93 +63,81 @@ function AnimatedBar({ persen }: { persen: number }) {
       const t = Math.min((ts - startRef.current) / 1200, 1);
       const eased = 1 - Math.pow(1 - t, 4);
       setWidth(from + (to - from) * eased);
-      if (t < 1) animRef.current = requestAnimationFrame(animate);
+
+      if (t < 1) {
+        animRef.current = requestAnimationFrame(animate);
+      }
     };
+
     animRef.current = requestAnimationFrame(animate);
-    return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
+
+    return () => {
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+    };
   }, [persen]);
 
   return (
     <div className="progress-bar-track">
-      <div
-        className={`progress-bar-fill ${getBarColor(persen)}`}
-        style={{ width: `${width}%` }}
-      />
+      <div className={`progress-bar-fill ${getBarColor(persen)}`} style={{ width: `${width}%` }} />
     </div>
   );
 }
 
-/* ── Updated flash animation for changed rows ── */
 function FlashRow({ children, changed }: { children: React.ReactNode; changed: boolean }) {
-  const [flash, setFlash] = useState(false);
-
-  useEffect(() => {
-    if (changed) {
-      setFlash(true);
-      const t = setTimeout(() => setFlash(false), 1500);
-      return () => clearTimeout(t);
-    }
-  }, [changed]);
-
-  return (
-    <tr className={`transition-colors border-b border-panel-border/30 ${flash ? "row-flash" : ""}`}>
-      {children}
-    </tr>
-  );
+  return <tr className={`transition-colors border-b border-panel-border/30 ${changed ? "row-flash" : ""}`}>{children}</tr>;
 }
 
-/* ── Main Dashboard Client Component ── */
-export function DashboardClient({ initialData }: { initialData: ApiData }) {
-  const [data, setData] = useState<ApiData>(initialData);
+export function DashboardClient({ initialData }: { initialData: TaxSummaryResponse }) {
+  const [data, setData] = useState<TaxSummaryResponse>(initialData);
   const [changedRows, setChangedRows] = useState<Set<number>>(new Set());
-  const prevDataRef = useRef<ApiData>(initialData);
+  const prevDataRef = useRef<TaxSummaryResponse>(initialData);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
-      const res = await fetch("https://api-bapenda.ichmal.my.id/api/realisasi-pajak", {
+      const res = await fetch("/api/realisasi-pajak", {
         cache: "no-store",
       });
-      if (!res.ok) return;
-      const fresh: ApiData = await res.json();
 
-      // Detect changed rows
+      if (!res.ok) return;
+
+      const fresh: TaxSummaryResponse = await res.json();
       const changed = new Set<number>();
-      fresh.rincian.forEach((row, i) => {
-        const prev = prevDataRef.current.rincian[i];
+
+      fresh.rincian.forEach((row, index) => {
+        const prev = prevDataRef.current.rincian[index];
         if (!prev || prev.realisasi !== row.realisasi || prev.target !== row.target) {
-          changed.add(i);
+          changed.add(index);
         }
       });
 
       prevDataRef.current = fresh;
-      setData(fresh);
-      setChangedRows(changed);
+      startTransition(() => {
+        setData(fresh);
+        setChangedRows(changed);
+      });
       setLastUpdated(new Date());
 
-      // Clear flash after animation
       if (changed.size > 0) {
         setTimeout(() => setChangedRows(new Set()), 2000);
       }
-    } catch (e) {
-      console.error("Polling error:", e);
+    } catch (error) {
+      console.error("Polling error:", error);
     }
   }, []);
 
   useEffect(() => {
-    const id = setInterval(fetchData, POLL_INTERVAL_MS);
-    return () => clearInterval(id);
+    const intervalId = setInterval(fetchData, POLL_INTERVAL_MS);
+    return () => clearInterval(intervalId);
   }, [fetchData]);
 
   const { ringkasan, rincian, tahun } = data;
 
   return (
     <div className="dashboard-wrapper" style={{ padding: "1.1vh 1.2vw" }}>
-      {/* Background accent orbs */}
       <div className="bg-accent-orb" />
       <div className="glow-line" />
 
-      {/* ─── Header ─── */}
       <header
         className="flex justify-between items-start"
         style={{ position: "relative", zIndex: 1, marginBottom: "1.5vh" }}
@@ -184,7 +148,7 @@ export function DashboardClient({ initialData }: { initialData: ApiData }) {
             style={{ width: "clamp(40px, 3.5vw, 64px)", height: "clamp(40px, 3.5vw, 64px)" }}
           >
             <div className="w-full h-full flex items-center justify-center">
-              <img src="/logo.png" alt="Logo Bapenda" className="w-full h-full object-contain" />
+              <Image src="/logo.png" alt="Logo Bapenda" width={64} height={64} className="w-full h-full object-contain" />
             </div>
           </div>
           <div>
@@ -199,11 +163,9 @@ export function DashboardClient({ initialData }: { initialData: ApiData }) {
             </h1>
             <p className="text-text-secondary" style={{ fontSize: "clamp(0.55rem, 0.7vw, 0.8rem)" }}>
               Kabupaten Batubara - Tahun Anggaran {tahun}
-              {lastUpdated && (
-                <span className="ml-2 opacity-50">
-                  · Diperbarui {lastUpdated.toLocaleTimeString("id-ID")}
-                </span>
-              )}
+              {lastUpdated ? (
+                <span className="ml-2 opacity-50">· Diperbarui {lastUpdated.toLocaleTimeString("id-ID")}</span>
+              ) : null}
             </p>
           </div>
         </div>
@@ -226,7 +188,6 @@ export function DashboardClient({ initialData }: { initialData: ApiData }) {
         </div>
       </header>
 
-      {/* ─── Summary Cards ─── */}
       <section
         className="grid grid-cols-4"
         style={{ gap: "0.8vw", position: "relative", zIndex: 1, marginBottom: "1.5vh" }}
@@ -245,7 +206,6 @@ export function DashboardClient({ initialData }: { initialData: ApiData }) {
         </SummaryCard>
       </section>
 
-      {/* ─── Table Section ─── */}
       <section className="table-section" style={{ flex: 1, position: "relative", zIndex: 1, minHeight: 0 }}>
         <div
           className="border-b border-panel-border"
@@ -266,19 +226,44 @@ export function DashboardClient({ initialData }: { initialData: ApiData }) {
                 className="text-text-secondary border-b border-panel-border"
                 style={{ background: "rgba(30, 41, 59, 0.7)" }}
               >
-                <th className="font-medium text-center" style={{ padding: "0.5vh 0.6vw", width: "4%" }}>No</th>
-                <th className="font-medium text-left" style={{ padding: "0.5vh 0.6vw", width: "31%" }}>Jenis Pajak / Retribusi</th>
-                <th className="font-medium text-right" style={{ padding: "0.5vh 0.6vw", width: "16%" }}>Target (Rp)</th>
-                <th className="font-medium text-right" style={{ padding: "0.5vh 0.6vw", width: "16%" }}>Realisasi (Rp)</th>
-                <th className="font-medium text-center" style={{ padding: "0.5vh 0.6vw", width: "17%" }}>%</th>
-                <th className="font-medium text-right" style={{ padding: "0.5vh 0.6vw", width: "16%" }}>Selisih (Rp)</th>
+                <th className="font-medium text-center" style={{ padding: "0.5vh 0.6vw", width: "4%" }}>
+                  No
+                </th>
+                <th className="font-medium text-left" style={{ padding: "0.5vh 0.6vw", width: "31%" }}>
+                  Jenis Pajak / Retribusi
+                </th>
+                <th className="font-medium text-right" style={{ padding: "0.5vh 0.6vw", width: "16%" }}>
+                  Target (Rp)
+                </th>
+                <th className="font-medium text-right" style={{ padding: "0.5vh 0.6vw", width: "16%" }}>
+                  Realisasi (Rp)
+                </th>
+                <th className="font-medium text-center" style={{ padding: "0.5vh 0.6vw", width: "17%" }}>
+                  %
+                </th>
+                <th className="font-medium text-right" style={{ padding: "0.5vh 0.6vw", width: "16%" }}>
+                  Selisih (Rp)
+                </th>
               </tr>
             </thead>
             <tbody className="text-text-secondary">
-              {rincian.map((row, i) => (
-                <FlashRow key={i} changed={changedRows.has(i)}>
-                  <td className="text-center" style={{ padding: "0.45vh 0.6vw", width: "4%" }}>{i + 1}</td>
-                  <td className="text-left text-text-primary" style={{ padding: "0.45vh 0.6vw", width: "31%" }}>{row.jenis_pajak}</td>
+              {rincian.map((row, index) => (
+                <FlashRow key={row.slug_jenis_pajak} changed={changedRows.has(index)}>
+                  <td className="text-center" style={{ padding: "0.45vh 0.6vw", width: "4%" }}>
+                    {index + 1}
+                  </td>
+                  <td style={{ padding: "0.45vh 0.6vw", width: "31%" }}>
+                    {row.detail_tersedia ? (
+                      <a
+                        href={`/realisasi/${row.slug_jenis_pajak}?tahun=${tahun}`}
+                        className="detail-row-link"
+                      >
+                        {row.jenis_pajak}
+                      </a>
+                    ) : (
+                      <span className="detail-row-title">{row.jenis_pajak}</span>
+                    )}
+                  </td>
                   <td className="text-right font-mono" style={{ padding: "0.45vh 0.6vw", width: "16%" }}>
                     <AnimatedRupiah value={row.target} />
                   </td>
@@ -301,7 +286,9 @@ export function DashboardClient({ initialData }: { initialData: ApiData }) {
             </tbody>
             <tfoot>
               <tr className="total-row text-text-primary font-semibold">
-                <td colSpan={2} style={{ padding: "0.55vh 0.6vw", width: "35%" }}>TOTAL KESELURUHAN</td>
+                <td colSpan={2} style={{ padding: "0.55vh 0.6vw", width: "35%" }}>
+                  TOTAL KESELURUHAN
+                </td>
                 <td className="text-right font-mono" style={{ padding: "0.55vh 0.6vw", width: "16%" }}>
                   <AnimatedRupiah value={ringkasan.total_target} />
                 </td>
@@ -320,7 +307,6 @@ export function DashboardClient({ initialData }: { initialData: ApiData }) {
         </div>
       </section>
 
-      {/* ─── Footer ─── */}
       <footer
         className="flex justify-between items-center text-text-secondary"
         style={{
@@ -341,7 +327,6 @@ export function DashboardClient({ initialData }: { initialData: ApiData }) {
   );
 }
 
-/* ── Sub-components ── */
 function SummaryCard({ label, color, children }: { label: string; color: string; children: React.ReactNode }) {
   return (
     <div className="summary-card flex flex-col items-center justify-center" style={{ padding: "1.5vh 0.5vw" }}>

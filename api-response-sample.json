@@ -1,0 +1,55 @@
+﻿{
+    "success":  true,
+    "message":  "Detail realisasi pajak berhasil diambil.",
+    "data":  {
+                 "jenis_pajak":  {
+                                     "kode":  "BPHTB",
+                                     "slug":  "bphtb",
+                                     "nama":  "Pajak BPHTB",
+                                     "sumber_data":  "sts_history"
+                                 },
+                 "ringkasan":  {
+                                   "target":  23000000000,
+                                   "realisasi":  1261758600,
+                                   "persentase_capaian":  5.49,
+                                   "sisa_anggaran":  21738241400,
+                                   "jumlah_transaksi":  418
+                               },
+                 "pembayaran":  {
+                                    "data":  [
+                                                 {
+                                                     "no_sts":  "128640404111201260473",
+                                                     "no_nop":  "122114002401800110",
+                                                     "no_pokok_wp":  "",
+                                                     "nama_pemilik":  "MADDEN MANIK",
+                                                     "alamat_pemilik":  "HUTA SIDOMAKMUR",
+                                                     "nilai":  4382000,
+                                                     "denda":  0,
+                                                     "total_bayar":  4382000,
+                                                     "tgl_bayar":  "2026-05-19 10:34:18",
+                                                     "kode_pengesahan":  "B3332775266",
+                                                     "kode_cab":  "262",
+                                                     "nama_channel":  "TELLER"
+                                                 }
+                                             ],
+                                    "pagination":  {
+                                                       "current_page":  1,
+                                                       "per_page":  1,
+                                                       "total":  418,
+                                                       "last_page":  418,
+                                                       "from":  1,
+                                                       "to":  1,
+                                                       "has_more_pages":  true
+                                                   },
+                                    "sorting":  {
+                                                    "sort_by":  "Tgl_Bayar",
+                                                    "sort_direction":  "desc"
+                                                }
+                                }
+             },
+    "filters":  {
+                    "tahun":  2026,
+                    "page":  1,
+                    "per_page":  1
+                }
+}

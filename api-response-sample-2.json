@@ -1,0 +1,55 @@
+﻿{
+    "success":  true,
+    "message":  "Detail realisasi pajak berhasil diambil.",
+    "data":  {
+                 "jenis_pajak":  {
+                                     "kode":  "Retribusi",
+                                     "slug":  "retribusi",
+                                     "nama":  "Retribusi Lainnya",
+                                     "sumber_data":  "sts_history"
+                                 },
+                 "ringkasan":  {
+                                   "target":  6313000000,
+                                   "realisasi":  1525612124,
+                                   "persentase_capaian":  24.17,
+                                   "sisa_anggaran":  4787387876,
+                                   "jumlah_transaksi":  1604
+                               },
+                 "pembayaran":  {
+                                    "data":  [
+                                                 {
+                                                     "no_sts":  "128641201412010723954 ",
+                                                     "no_nop":  "412023645",
+                                                     "no_pokok_wp":  "00001316",
+                                                     "nama_pemilik":  "Dinas Perumahan, Kawasan Permukiman dan Lingkungan Hidup",
+                                                     "alamat_pemilik":  "",
+                                                     "nilai":  300000,
+                                                     "denda":  0,
+                                                     "total_bayar":  300000,
+                                                     "tgl_bayar":  "2026-05-19 13:57:08",
+                                                     "kode_pengesahan":  "U3649787646",
+                                                     "kode_cab":  "268",
+                                                     "nama_channel":  "TELLER"
+                                                 }
+                                             ],
+                                    "pagination":  {
+                                                       "current_page":  1,
+                                                       "per_page":  1,
+                                                       "total":  1604,
+                                                       "last_page":  1604,
+                                                       "from":  1,
+                                                       "to":  1,
+                                                       "has_more_pages":  true
+                                                   },
+                                    "sorting":  {
+                                                    "sort_by":  "Tgl_Bayar",
+                                                    "sort_direction":  "desc"
+                                                }
+                                }
+             },
+    "filters":  {
+                    "tahun":  2026,
+                    "page":  1,
+                    "per_page":  1
+                }
+}

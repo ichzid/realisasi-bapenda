@@ -1,0 +1,181 @@
+﻿{
+    "success":  true,
+    "message":  "Data ringkasan realisasi \u0026 target berhasil diambil.",
+    "tahun":  2026,
+    "ringkasan":  {
+                      "total_target":  193921858370,
+                      "total_realisasi":  58751522634,
+                      "persentase_capaian":  30.3,
+                      "selisih_anggaran":  -135170335736
+                  },
+    "rincian":  [
+                    {
+                        "jenis_pajak":  "Pajak Bumi dan Bangunan",
+                        "kode_jenis_pajak":  "PBB",
+                        "slug_jenis_pajak":  "pbb",
+                        "sumber_data":  "epbb_db",
+                        "detail_tersedia":  false,
+                        "detail_endpoint":  null,
+                        "target":  57950007794,
+                        "realisasi":  24572300066,
+                        "persentase":  42.4,
+                        "selisih":  -33377707728
+                    },
+                    {
+                        "jenis_pajak":  "Pajak BPHTB",
+                        "kode_jenis_pajak":  "BPHTB",
+                        "slug_jenis_pajak":  "bphtb",
+                        "sumber_data":  "sts_history",
+                        "detail_tersedia":  true,
+                        "detail_endpoint":  "/api/realisasi-pajak/bphtb/detail",
+                        "target":  23000000000,
+                        "realisasi":  1261758600,
+                        "persentase":  5.49,
+                        "selisih":  -21738241400
+                    },
+                    {
+                        "jenis_pajak":  "PBJT Atas Makanan dan Minuman",
+                        "kode_jenis_pajak":  "Pajak Restoran",
+                        "slug_jenis_pajak":  "pajak-restoran",
+                        "sumber_data":  "sts_history",
+                        "detail_tersedia":  true,
+                        "detail_endpoint":  "/api/realisasi-pajak/pajak-restoran/detail",
+                        "target":  4000000000,
+                        "realisasi":  1410065385,
+                        "persentase":  35.25,
+                        "selisih":  -2589934615
+                    },
+                    {
+                        "jenis_pajak":  "PBJT Atas Tenaga Listrik",
+                        "kode_jenis_pajak":  "Pajak Penerangan",
+                        "slug_jenis_pajak":  "pajak-penerangan",
+                        "sumber_data":  "sts_history",
+                        "detail_tersedia":  true,
+                        "detail_endpoint":  "/api/realisasi-pajak/pajak-penerangan/detail",
+                        "target":  76500000000,
+                        "realisasi":  23389174034,
+                        "persentase":  30.57,
+                        "selisih":  -53110825966
+                    },
+                    {
+                        "jenis_pajak":  "PBJT Atas Jasa Perhotelan",
+                        "kode_jenis_pajak":  "Pajak Hotel",
+                        "slug_jenis_pajak":  "pajak-hotel",
+                        "sumber_data":  "sts_history",
+                        "detail_tersedia":  true,
+                        "detail_endpoint":  "/api/realisasi-pajak/pajak-hotel/detail",
+                        "target":  350000000,
+                        "realisasi":  103899376,
+                        "persentase":  29.69,
+                        "selisih":  -246100624
+                    },
+                    {
+                        "jenis_pajak":  "PBJT Atas Jasa Parkir",
+                        "kode_jenis_pajak":  "Pajak Parkir",
+                        "slug_jenis_pajak":  "pajak-parkir",
+                        "sumber_data":  "sts_history",
+                        "detail_tersedia":  true,
+                        "detail_endpoint":  "/api/realisasi-pajak/pajak-parkir/detail",
+                        "target":  150000000,
+                        "realisasi":  56612100,
+                        "persentase":  37.74,
+                        "selisih":  -93387900
+                    },
+                    {
+                        "jenis_pajak":  "PBJT Atas Jasa Kesenian dan Hiburan",
+                        "kode_jenis_pajak":  "Pajak Hiburan",
+                        "slug_jenis_pajak":  "pajak-hiburan",
+                        "sumber_data":  "sts_history",
+                        "detail_tersedia":  true,
+                        "detail_endpoint":  "/api/realisasi-pajak/pajak-hiburan/detail",
+                        "target":  80000000,
+                        "realisasi":  48001200,
+                        "persentase":  60,
+                        "selisih":  -31998800
+                    },
+                    {
+                        "jenis_pajak":  "Pajak Reklame",
+                        "kode_jenis_pajak":  "Pajak Reklame",
+                        "slug_jenis_pajak":  "pajak-reklame",
+                        "sumber_data":  "sts_history",
+                        "detail_tersedia":  true,
+                        "detail_endpoint":  "/api/realisasi-pajak/pajak-reklame/detail",
+                        "target":  1000000000,
+                        "realisasi":  247716666,
+                        "persentase":  24.77,
+                        "selisih":  -752283334
+                    },
+                    {
+                        "jenis_pajak":  "Pajak Air Tanah (PAT)",
+                        "kode_jenis_pajak":  "Pajak Air Tanah",
+                        "slug_jenis_pajak":  "pajak-air-tanah",
+                        "sumber_data":  "sts_history",
+                        "detail_tersedia":  true,
+                        "detail_endpoint":  "/api/realisasi-pajak/pajak-air-tanah/detail",
+                        "target":  2000000000,
+                        "realisasi":  962873053,
+                        "persentase":  48.14,
+                        "selisih":  -1037126947
+                    },
+                    {
+                        "jenis_pajak":  "Pajak Mineral Bukan Logam dan Batuan (MBLB)",
+                        "kode_jenis_pajak":  "Pajak Galian",
+                        "slug_jenis_pajak":  "pajak-galian",
+                        "sumber_data":  "sts_history",
+                        "detail_tersedia":  true,
+                        "detail_endpoint":  "/api/realisasi-pajak/pajak-galian/detail",
+                        "target":  500000000,
+                        "realisasi":  0,
+                        "persentase":  0,
+                        "selisih":  -500000000
+                    },
+                    {
+                        "jenis_pajak":  "Pajak Sarang Burung Walet",
+                        "kode_jenis_pajak":  "Pajak Sarang Burung Walet",
+                        "slug_jenis_pajak":  "pajak-sarang-burung-walet",
+                        "sumber_data":  "sts_history",
+                        "detail_tersedia":  true,
+                        "detail_endpoint":  "/api/realisasi-pajak/pajak-sarang-burung-walet/detail",
+                        "target":  75000000,
+                        "realisasi":  5000000,
+                        "persentase":  6.67,
+                        "selisih":  -70000000
+                    },
+                    {
+                        "jenis_pajak":  "Opsen PKB",
+                        "kode_jenis_pajak":  "Opsen PKB",
+                        "slug_jenis_pajak":  "opsen-pkb",
+                        "sumber_data":  "simpada",
+                        "detail_tersedia":  false,
+                        "detail_endpoint":  null,
+                        "target":  10289383518,
+                        "realisasi":  2446433430,
+                        "persentase":  23.78,
+                        "selisih":  -7842950088
+                    },
+                    {
+                        "jenis_pajak":  "Opsen BBNKB",
+                        "kode_jenis_pajak":  "Opsen BBNKB",
+                        "slug_jenis_pajak":  "opsen-bbnkb",
+                        "sumber_data":  "simpada",
+                        "detail_tersedia":  false,
+                        "detail_endpoint":  null,
+                        "target":  11714467058,
+                        "realisasi":  2722076600,
+                        "persentase":  23.24,
+                        "selisih":  -8992390458
+                    },
+                    {
+                        "jenis_pajak":  "Retribusi Lainnya",
+                        "kode_jenis_pajak":  "Retribusi",
+                        "slug_jenis_pajak":  "retribusi",
+                        "sumber_data":  "sts_history",
+                        "detail_tersedia":  true,
+                        "detail_endpoint":  "/api/realisasi-pajak/retribusi/detail",
+                        "target":  6313000000,
+                        "realisasi":  1525612124,
+                        "persentase":  24.17,
+                        "selisih":  -4787387876
+                    }
+                ]
+}
