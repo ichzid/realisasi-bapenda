@@ -10,33 +10,115 @@
                                  },
                  "ringkasan":  {
                                    "target":  23000000000,
-                                   "realisasi":  1261758600,
-                                   "persentase_capaian":  5.49,
-                                   "sisa_anggaran":  21738241400,
-                                   "jumlah_transaksi":  418
+                                   "realisasi":  1264758600,
+                                   "persentase_capaian":  5.5,
+                                   "sisa_anggaran":  21735241400,
+                                   "jumlah_transaksi":  421
                                },
+                 "top_pembayar":  [
+                                      {
+                                          "no_pokok_wp":  "",
+                                          "nama_pemilik":  "JEENNY",
+                                          "total_nilai":  87500000,
+                                          "total_denda":  0,
+                                          "total_bayar":  87500000,
+                                          "jumlah_transaksi":  1
+                                      },
+                                      {
+                                          "no_pokok_wp":  "",
+                                          "nama_pemilik":  "TITIEK SUGIHARTI",
+                                          "total_nilai":  50614400,
+                                          "total_denda":  0,
+                                          "total_bayar":  50614400,
+                                          "jumlah_transaksi":  1
+                                      },
+                                      {
+                                          "no_pokok_wp":  "",
+                                          "nama_pemilik":  "KRISMAN",
+                                          "total_nilai":  49859300,
+                                          "total_denda":  0,
+                                          "total_bayar":  49859300,
+                                          "jumlah_transaksi":  3
+                                      },
+                                      {
+                                          "no_pokok_wp":  "",
+                                          "nama_pemilik":  "TJIO TJIO ALS ANNA SIMA",
+                                          "total_nilai":  49729500,
+                                          "total_denda":  0,
+                                          "total_bayar":  49729500,
+                                          "jumlah_transaksi":  3
+                                      },
+                                      {
+                                          "no_pokok_wp":  "",
+                                          "nama_pemilik":  "IR ADNAN B MOKODOMPIT",
+                                          "total_nilai":  47650000,
+                                          "total_denda":  0,
+                                          "total_bayar":  47650000,
+                                          "jumlah_transaksi":  2
+                                      },
+                                      {
+                                          "no_pokok_wp":  "",
+                                          "nama_pemilik":  "DEWI SAFITRI PULUNGAN",
+                                          "total_nilai":  38291700,
+                                          "total_denda":  0,
+                                          "total_bayar":  38291700,
+                                          "jumlah_transaksi":  2
+                                      },
+                                      {
+                                          "no_pokok_wp":  "",
+                                          "nama_pemilik":  "FERNANDO BATUBARA",
+                                          "total_nilai":  33022000,
+                                          "total_denda":  0,
+                                          "total_bayar":  33022000,
+                                          "jumlah_transaksi":  1
+                                      },
+                                      {
+                                          "no_pokok_wp":  "",
+                                          "nama_pemilik":  "LILIS SUTAMI",
+                                          "total_nilai":  31000000,
+                                          "total_denda":  0,
+                                          "total_bayar":  31000000,
+                                          "jumlah_transaksi":  2
+                                      },
+                                      {
+                                          "no_pokok_wp":  "",
+                                          "nama_pemilik":  "YUSMARIATI",
+                                          "total_nilai":  23000000,
+                                          "total_denda":  0,
+                                          "total_bayar":  23000000,
+                                          "jumlah_transaksi":  1
+                                      },
+                                      {
+                                          "no_pokok_wp":  "",
+                                          "nama_pemilik":  "NASIR HAPOSAN MARPAUNG",
+                                          "total_nilai":  22500000,
+                                          "total_denda":  0,
+                                          "total_bayar":  22500000,
+                                          "jumlah_transaksi":  1
+                                      }
+                                  ],
                  "pembayaran":  {
                                     "data":  [
                                                  {
-                                                     "no_sts":  "128640404111201260473",
-                                                     "no_nop":  "122114002401800110",
+                                                     "no_sts":  "128640404111201260498",
+                                                     "no_nop":  "122114101200104380",
                                                      "no_pokok_wp":  "",
-                                                     "nama_pemilik":  "MADDEN MANIK",
-                                                     "alamat_pemilik":  "HUTA SIDOMAKMUR",
-                                                     "nilai":  4382000,
+                                                     "nama_pemilik":  "IMAM TRIANDRA",
+                                                     "alamat_pemilik":  "DUSUN II SRI KEMUNING",
+                                                     "nilai":  0,
                                                      "denda":  0,
-                                                     "total_bayar":  4382000,
-                                                     "tgl_bayar":  "2026-05-19 10:34:18",
-                                                     "kode_pengesahan":  "B3332775266",
-                                                     "kode_cab":  "262",
-                                                     "nama_channel":  "TELLER"
+                                                     "total_bayar":  0,
+                                                     "tgl_bayar":  "2026-05-20 12:28:05",
+                                                     "kode_pengesahan":  "BB260498",
+                                                     "kode_cab":  "",
+                                                     "nama_channel":  ""
                                                  }
                                              ],
                                     "pagination":  {
                                                        "current_page":  1,
                                                        "per_page":  1,
-                                                       "total":  418,
-                                                       "last_page":  418,
+                                                       "total":  421,
+                                                       "last_page":  421,
                                                        "from":  1,
                                                        "to":  1,
                                                        "has_more_pages":  true

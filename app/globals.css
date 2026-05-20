@@ -1022,10 +1022,9 @@ body {
   display: flex;
   align-items: stretch;
   gap: 0;
-  border-bottom: 1px solid rgba(51, 65, 85, 0.6);
-  background:
-    linear-gradient(160deg, rgba(29, 78, 216, 0.12) 0%, rgba(15, 23, 42, 0.0) 60%);
+  padding: 0.75rem 1rem 0;
   flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 /* Hero left — tax name block */
@@ -1079,6 +1078,11 @@ body {
   display: flex;
   align-items: stretch;
   min-width: 0;
+  border: 1px solid rgba(51, 65, 85, 0.7);
+  border-radius: 0.85rem;
+  background: linear-gradient(160deg, rgba(29, 78, 216, 0.14) 0%, rgba(15, 23, 42, 0.82) 62%);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  overflow: hidden;
 }
 
 .dp-metric {
@@ -1292,9 +1296,10 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.65rem 1.25rem;
-  border-bottom: 1px solid rgba(51, 65, 85, 0.5);
-  background: rgba(13, 23, 46, 0.7);
+  height: 3.75rem;
+  padding: 0 1.25rem;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.55);
+  background: rgba(13, 23, 46, 0.72);
   flex-shrink: 0;
   width: 100%;
   box-sizing: border-box;
@@ -1994,6 +1999,247 @@ body {
   color: var(--color-accent-gold);
   font-weight: 600;
   cursor: default;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Detail Page — two-column body layout
+═══════════════════════════════════════════════════════════ */
+
+/* Outer wrapper that splits Top Pembayar (left) + Riwayat (right) */
+.dp-body-layout {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+/* ── Left panel: Top Pembayar ─────────────────────────────── */
+.dp-top-pembayar-panel {
+  order: 2;
+  flex: 0 0 360px;
+  width: 360px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(51, 65, 85, 0.7);
+  border-radius: 1rem;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(10, 18, 38, 0.78));
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+}
+
+/* ── Right panel: Riwayat Pembayaran ─────────────────────── */
+.dp-riwayat-panel {
+  order: 1;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(51, 65, 85, 0.7);
+  border-radius: 1rem;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(10, 18, 38, 0.74));
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+}
+
+/* ── Top Pembayar header ─────────────────────────────────── */
+.tp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  height: 3.75rem;
+  padding: 0 1.25rem;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.55);
+  background: rgba(13, 23, 46, 0.72);
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.tp-title {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+.tp-subtitle {
+  font-size: 0.68rem;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+/* ── Top Pembayar scrollable list ────────────────────────── */
+.tp-list-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.75rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(51, 65, 85, 0.6) transparent;
+}
+
+.tp-list-wrap::-webkit-scrollbar {
+  width: 4px;
+}
+
+.tp-list-wrap::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tp-list-wrap::-webkit-scrollbar-thumb {
+  background: rgba(51, 65, 85, 0.7);
+  border-radius: 9999px;
+}
+
+/* ── Top Pembayar item row ────────────────────────────────── */
+.tp-item {
+  display: grid;
+  grid-template-columns: 1.65rem minmax(0, 1fr);
+  grid-template-areas:
+    "rank body"
+    "rank amount";
+  align-items: start;
+  column-gap: 0.7rem;
+  row-gap: 0.35rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid rgba(51, 65, 85, 0.42);
+  border-radius: 0.8rem;
+  background: rgba(15, 23, 42, 0.42);
+  transition: background 0.12s, border-color 0.12s, transform 0.12s;
+}
+
+.tp-item + .tp-item {
+  margin-top: 0.55rem;
+}
+
+.tp-item:hover {
+  background: rgba(30, 41, 59, 0.56);
+  border-color: rgba(251, 191, 36, 0.22);
+  transform: translateY(-1px);
+}
+
+/* Rank badge */
+.tp-rank {
+  grid-area: rank;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  background: rgba(51, 65, 85, 0.45);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+  color: var(--color-text-secondary);
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+/* Item body (name + meta) */
+.tp-item-body {
+  grid-area: body;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.tp-item-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.tp-item-meta {
+  font-size: 0.68rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Item amount (right-aligned) */
+.tp-item-amount {
+  grid-area: amount;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 0.25rem 0.45rem;
+  text-align: right;
+}
+
+.tp-item-total {
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--color-accent-gold);
+  white-space: nowrap;
+}
+
+.tp-item-denda {
+  font-size: 0.65rem;
+  color: var(--color-accent-red);
+  white-space: nowrap;
+}
+
+/* Skeleton loading state for tp-item */
+.tp-item-skeleton {
+  opacity: 0.65;
+}
+
+.tp-rank-skeleton {
+  background: rgba(51, 65, 85, 0.3) !important;
+  border-color: rgba(51, 65, 85, 0.2) !important;
+  color: transparent !important;
+}
+
+/* Empty state */
+.tp-empty {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+}
+
+/* ── Responsive: stack vertically on small screens ─────── */
+@media (max-width: 1100px) {
+  .dp-top-pembayar-panel {
+    flex-basis: 320px;
+    width: 320px;
+  }
+}
+
+@media (max-width: 900px) {
+  .dp-body-layout {
+    flex-direction: column;
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
+
+  .dp-top-pembayar-panel {
+    flex: 0 0 auto;
+    width: 100%;
+    max-height: 280px;
+  }
 }
 
 .dt-page-ellipsis {

@@ -10,33 +10,115 @@
                                  },
                  "ringkasan":  {
                                    "target":  6313000000,
-                                   "realisasi":  1525612124,
-                                   "persentase_capaian":  24.17,
-                                   "sisa_anggaran":  4787387876,
-                                   "jumlah_transaksi":  1604
+                                   "realisasi":  1528112124,
+                                   "persentase_capaian":  24.21,
+                                   "sisa_anggaran":  4784887876,
+                                   "jumlah_transaksi":  1605
                                },
+                 "top_pembayar":  [
+                                      {
+                                          "no_pokok_wp":  "078/SKRD/DPMPTSP-BB/XII/2",
+                                          "nama_pemilik":  "Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu",
+                                          "total_nilai":  116440000,
+                                          "total_denda":  0,
+                                          "total_bayar":  116440000,
+                                          "jumlah_transaksi":  1
+                                      },
+                                      {
+                                          "no_pokok_wp":  "077/SKRD/DPMPTSP-BB/XII/2",
+                                          "nama_pemilik":  "Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu",
+                                          "total_nilai":  105108400,
+                                          "total_denda":  0,
+                                          "total_bayar":  105108400,
+                                          "jumlah_transaksi":  1
+                                      },
+                                      {
+                                          "no_pokok_wp":  "2026028",
+                                          "nama_pemilik":  "Dinas PUTR",
+                                          "total_nilai":  48724374,
+                                          "total_denda":  0,
+                                          "total_bayar":  48724374,
+                                          "jumlah_transaksi":  1
+                                      },
+                                      {
+                                          "no_pokok_wp":  "delima_Indrapura",
+                                          "nama_pemilik":  "Dinas Ketenagakerjaan, Perindustrian dan Perdagangan",
+                                          "total_nilai":  45720000,
+                                          "total_denda":  0,
+                                          "total_bayar":  45720000,
+                                          "jumlah_transaksi":  19
+                                      },
+                                      {
+                                          "no_pokok_wp":  "2026041",
+                                          "nama_pemilik":  "Dinas PUTR",
+                                          "total_nilai":  34803124,
+                                          "total_denda":  0,
+                                          "total_bayar":  34803124,
+                                          "jumlah_transaksi":  1
+                                      },
+                                      {
+                                          "no_pokok_wp":  "202503029",
+                                          "nama_pemilik":  "Dinas Perhubungan",
+                                          "total_nilai":  30000000,
+                                          "total_denda":  0,
+                                          "total_bayar":  30000000,
+                                          "jumlah_transaksi":  2
+                                      },
+                                      {
+                                          "no_pokok_wp":  "013/SKRD/DPMPTSP-BB/III/2",
+                                          "nama_pemilik":  "Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu",
+                                          "total_nilai":  29194011,
+                                          "total_denda":  0,
+                                          "total_bayar":  29194011,
+                                          "jumlah_transaksi":  1
+                                      },
+                                      {
+                                          "no_pokok_wp":  "008A1-21",
+                                          "nama_pemilik":  "Dinas Ketenagakerjaan, Perindustrian dan Perdagangan",
+                                          "total_nilai":  22813000,
+                                          "total_denda":  0,
+                                          "total_bayar":  22813000,
+                                          "jumlah_transaksi":  10
+                                      },
+                                      {
+                                          "no_pokok_wp":  "029/SKRD/DPMPTSP-BB/V/202",
+                                          "nama_pemilik":  "Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu",
+                                          "total_nilai":  21900375,
+                                          "total_denda":  0,
+                                          "total_bayar":  21900375,
+                                          "jumlah_transaksi":  1
+                                      },
+                                      {
+                                          "no_pokok_wp":  "091/SKRD/DPMPTSP-BB/XII/2",
+                                          "nama_pemilik":  "Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu",
+                                          "total_nilai":  20000000,
+                                          "total_denda":  600000,
+                                          "total_bayar":  20600000,
+                                          "jumlah_transaksi":  1
+                                      }
+                                  ],
                  "pembayaran":  {
                                     "data":  [
                                                  {
-                                                     "no_sts":  "128641201412010723954 ",
-                                                     "no_nop":  "412023645",
-                                                     "no_pokok_wp":  "00001316",
-                                                     "nama_pemilik":  "Dinas Perumahan, Kawasan Permukiman dan Lingkungan Hidup",
+                                                     "no_sts":  "128641201412011924264 ",
+                                                     "no_nop":  "412023954",
+                                                     "no_pokok_wp":  "20260530",
+                                                     "nama_pemilik":  "Dinas Perhubungan",
                                                      "alamat_pemilik":  "",
-                                                     "nilai":  300000,
+                                                     "nilai":  2500000,
                                                      "denda":  0,
-                                                     "total_bayar":  300000,
-                                                     "tgl_bayar":  "2026-05-19 13:57:08",
-                                                     "kode_pengesahan":  "U3649787646",
-                                                     "kode_cab":  "268",
+                                                     "total_bayar":  2500000,
+                                                     "tgl_bayar":  "2026-05-19 15:53:32",
+                                                     "kode_pengesahan":  "U3439795259",
+                                                     "kode_cab":  "262",
                                                      "nama_channel":  "TELLER"
                                                  }
                                              ],
                                     "pagination":  {
                                                        "current_page":  1,
                                                        "per_page":  1,
-                                                       "total":  1604,
-                                                       "last_page":  1604,
+                                                       "total":  1605,
+                                                       "last_page":  1605,
                                                        "from":  1,
                                                        "to":  1,
                                                        "has_more_pages":  true

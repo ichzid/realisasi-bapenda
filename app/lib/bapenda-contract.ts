@@ -26,6 +26,15 @@ export interface TaxSummaryResponse {
   rincian: TaxSummaryItem[];
 }
 
+export interface TaxTopPembayarItem {
+  no_pokok_wp: string | null;
+  nama_pemilik: string | null;
+  total_nilai: number;
+  total_denda: number;
+  total_bayar: number;
+  jumlah_transaksi: number;
+}
+
 export interface TaxDetailPaymentItem {
   no_sts: string | null;
   no_sspd?: string | null; // Keep optional if still present for other taxes
@@ -63,6 +72,7 @@ export interface TaxDetailResponse {
       sisa_anggaran: number;
       jumlah_transaksi: number;
     };
+    top_pembayar: TaxTopPembayarItem[];
     pembayaran: {
       data: TaxDetailPaymentItem[];
       pagination: {
@@ -100,13 +110,13 @@ interface TaxFallbackMeta {
 }
 
 const TAX_FALLBACKS: Record<string, TaxFallbackMeta> = {
-  "Pajak Bumi dan Bangunan Perdesaan dan Perkotaan (PBB-P2)": {
+  "Pajak Bumi dan Bangunan": {
     kode_jenis_pajak: "PBB",
     slug_jenis_pajak: "pbb",
     sumber_data: "epbb_db",
     detail_tersedia: false,
   },
-  "Bea Perolehan Hak Atas Tanah dan Bangunan (BPHTB)": {
+  "Pajak BPHTB": {
     kode_jenis_pajak: "BPHTB",
     slug_jenis_pajak: "bphtb",
     sumber_data: "sts_history",
@@ -119,8 +129,8 @@ const TAX_FALLBACKS: Record<string, TaxFallbackMeta> = {
     detail_tersedia: true,
   },
   "PBJT Atas Tenaga Listrik": {
-    kode_jenis_pajak: "Pajak Tenaga Listrik",
-    slug_jenis_pajak: "pajak-tenaga-listrik",
+    kode_jenis_pajak: "Pajak Penerangan",
+    slug_jenis_pajak: "pajak-penerangan",
     sumber_data: "sts_history",
     detail_tersedia: true,
   },
@@ -155,8 +165,8 @@ const TAX_FALLBACKS: Record<string, TaxFallbackMeta> = {
     detail_tersedia: true,
   },
   "Pajak Mineral Bukan Logam dan Batuan (MBLB)": {
-    kode_jenis_pajak: "Pajak MBLB",
-    slug_jenis_pajak: "pajak-mineral-bukan-logam-dan-batuan",
+    kode_jenis_pajak: "Pajak Galian",
+    slug_jenis_pajak: "pajak-galian",
     sumber_data: "sts_history",
     detail_tersedia: true,
   },
@@ -179,8 +189,8 @@ const TAX_FALLBACKS: Record<string, TaxFallbackMeta> = {
     detail_tersedia: false,
   },
   "Retribusi Lainnya": {
-    kode_jenis_pajak: "Retribusi Lainnya",
-    slug_jenis_pajak: "retribusi-lainnya",
+    kode_jenis_pajak: "Retribusi",
+    slug_jenis_pajak: "retribusi",
     sumber_data: "sts_history",
     detail_tersedia: true,
   },

@@ -4,9 +4,9 @@
     "tahun":  2026,
     "ringkasan":  {
                       "total_target":  193921858370,
-                      "total_realisasi":  58751522634,
-                      "persentase_capaian":  30.3,
-                      "selisih_anggaran":  -135170335736
+                      "total_realisasi":  58822317647,
+                      "persentase_capaian":  30.33,
+                      "selisih_anggaran":  -135099540723
                   },
     "rincian":  [
                     {
@@ -17,9 +17,9 @@
                         "detail_tersedia":  false,
                         "detail_endpoint":  null,
                         "target":  57950007794,
-                        "realisasi":  24572300066,
-                        "persentase":  42.4,
-                        "selisih":  -33377707728
+                        "realisasi":  24629364459,
+                        "persentase":  42.5,
+                        "selisih":  -33320643335
                     },
                     {
                         "jenis_pajak":  "Pajak BPHTB",
@@ -29,9 +29,9 @@
                         "detail_tersedia":  true,
                         "detail_endpoint":  "/api/realisasi-pajak/bphtb/detail",
                         "target":  23000000000,
-                        "realisasi":  1261758600,
-                        "persentase":  5.49,
-                        "selisih":  -21738241400
+                        "realisasi":  1264758600,
+                        "persentase":  5.5,
+                        "selisih":  -21735241400
                     },
                     {
                         "jenis_pajak":  "PBJT Atas Makanan dan Minuman",
@@ -41,9 +41,9 @@
                         "detail_tersedia":  true,
                         "detail_endpoint":  "/api/realisasi-pajak/pajak-restoran/detail",
                         "target":  4000000000,
-                        "realisasi":  1410065385,
-                        "persentase":  35.25,
-                        "selisih":  -2589934615
+                        "realisasi":  1413224485,
+                        "persentase":  35.33,
+                        "selisih":  -2586775515
                     },
                     {
                         "jenis_pajak":  "PBJT Atas Tenaga Listrik",
@@ -65,9 +65,9 @@
                         "detail_tersedia":  true,
                         "detail_endpoint":  "/api/realisasi-pajak/pajak-hotel/detail",
                         "target":  350000000,
-                        "realisasi":  103899376,
-                        "persentase":  29.69,
-                        "selisih":  -246100624
+                        "realisasi":  106078376,
+                        "persentase":  30.31,
+                        "selisih":  -243921624
                     },
                     {
                         "jenis_pajak":  "PBJT Atas Jasa Parkir",
@@ -77,9 +77,9 @@
                         "detail_tersedia":  true,
                         "detail_endpoint":  "/api/realisasi-pajak/pajak-parkir/detail",
                         "target":  150000000,
-                        "realisasi":  56612100,
-                        "persentase":  37.74,
-                        "selisih":  -93387900
+                        "realisasi":  57362100,
+                        "persentase":  38.24,
+                        "selisih":  -92637900
                     },
                     {
                         "jenis_pajak":  "PBJT Atas Jasa Kesenian dan Hiburan",
@@ -113,9 +113,9 @@
                         "detail_tersedia":  true,
                         "detail_endpoint":  "/api/realisasi-pajak/pajak-air-tanah/detail",
                         "target":  2000000000,
-                        "realisasi":  962873053,
-                        "persentase":  48.14,
-                        "selisih":  -1037126947
+                        "realisasi":  965015573,
+                        "persentase":  48.25,
+                        "selisih":  -1034984427
                     },
                     {
                         "jenis_pajak":  "Pajak Mineral Bukan Logam dan Batuan (MBLB)",
@@ -173,9 +173,9 @@
                         "detail_tersedia":  true,
                         "detail_endpoint":  "/api/realisasi-pajak/retribusi/detail",
                         "target":  6313000000,
-                        "realisasi":  1525612124,
-                        "persentase":  24.17,
-                        "selisih":  -4787387876
+                        "realisasi":  1528112124,
+                        "persentase":  24.21,
+                        "selisih":  -4784887876
                     }
                 ]
 }

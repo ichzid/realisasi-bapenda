@@ -1,14 +1,14 @@
 "use client";
 
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
   ApiErrorResponse,
-  TaxDataSource,
   TaxDetailPaymentItem,
   TaxDetailResponse,
-  TaxSummaryResponse,
+  TaxTopPembayarItem,
 } from "@/app/lib/bapenda-contract";
 
 interface DetailPageClientProps {
@@ -21,7 +21,7 @@ interface DetailPageClientProps {
 type SortBy = "tgl_bayar" | "no_sts" | "nama_pemilik" | "nilai" | "total_bayar";
 type SortDir = "asc" | "desc";
 
-const FETCH_ALL_PER_PAGE = 1000;
+const FETCH_ALL_PER_PAGE = 100;
 const PER_PAGE_OPTIONS = [10, 25, 50, 100];
 
 /* ── Helpers ─────────────────────────────────────────────────────────── */
@@ -38,11 +38,6 @@ function formatDateTime(value: string | null): string {
   const date = new Date(value.replace(" ", "T"));
   if (Number.isNaN(date.getTime())) return value;
   return new Intl.DateTimeFormat("id-ID", { dateStyle: "medium", timeStyle: "short" }).format(date);
-}
-function getSourceLabel(source: TaxDataSource): string {
-  if (source === "epbb_db") return "EPBB";
-  if (source === "simpada") return "SIMPADA";
-  return "STS";
 }
 function buildPaymentKey(payment: TaxDetailPaymentItem, index: number): string {
   return [payment.no_sts ?? "sts", payment.no_nop ?? "nop", payment.kode_pengesahan ?? "kode", payment.tgl_bayar ?? "t", payment.total_bayar, index].join("-");
@@ -88,6 +83,7 @@ export function DetailPageClient({ slug, initialYear, initialPage, initialPerPag
 
   /* Detail (fetch all, sort/paginate client-side) */
   const [allRows, setAllRows] = useState<TaxDetailPaymentItem[]>([]);
+  const [topPembayar, setTopPembayar] = useState<TaxTopPembayarItem[]>([]);
   const [jenisPajak, setJenisPajak] = useState<TaxDetailResponse["data"]["jenis_pajak"] | null>(null);
   const [ringkasan, setRingkasan] = useState<DetailRingkasan | null>(null);
   const [detailLoading, setDetailLoading] = useState(true);
@@ -133,17 +129,20 @@ export function DetailPageClient({ slug, initialYear, initialPage, initialPerPag
     setAllRows(collected);
     setJenisPajak(first.data.jenis_pajak);
     setRingkasan(first.data.ringkasan);
+    setTopPembayar(first.data.top_pembayar ?? []);
     setDetailFetched(true);
     setDetailLoading(false);
   }, [slug, year]);
 
   useEffect(() => {
     const controller = new AbortController();
-    fetchAllRows(controller.signal).catch((err: unknown) => {
-      if (err instanceof Error && err.name === "AbortError") return;
-      setDetailError(err instanceof Error ? err.message : "Gagal memuat detail.");
-      setDetailLoading(false);
-    });
+    void Promise.resolve()
+      .then(() => fetchAllRows(controller.signal))
+      .catch((err: unknown) => {
+        if (err instanceof Error && err.name === "AbortError") return;
+        setDetailError(err instanceof Error ? err.message : "Gagal memuat detail.");
+        setDetailLoading(false);
+      });
     return () => controller.abort();
   }, [fetchAllRows]);
 
@@ -161,6 +160,7 @@ export function DetailPageClient({ slug, initialYear, initialPage, initialPerPag
     return allRows.filter(
       (r) =>
         (r.nama_pemilik ?? "").toLowerCase().includes(q) ||
+        (r.no_pokok_wp ?? "").toLowerCase().includes(q) ||
         (r.no_sts ?? "").toLowerCase().includes(q) ||
         (r.no_nop ?? "").toLowerCase().includes(q) ||
         String(r.total_bayar).includes(q) ||
@@ -224,7 +224,7 @@ export function DetailPageClient({ slug, initialYear, initialPage, initialPerPag
       {/* Top bar */}
       <header className="dp-topbar">
         <div className="dp-topbar-left">
-          <a href="/" className="detail-back-link">← Kembali ke dashboard</a>
+          <Link href="/" className="detail-back-link">← Kembali ke dashboard</Link>
           <span className="dp-topbar-sep">/</span>
           <span className="dp-topbar-crumb">
             {detailLoading ? <Skeleton width="8rem" /> : (jenisPajak?.nama ?? slug)}
@@ -247,161 +247,196 @@ export function DetailPageClient({ slug, initialYear, initialPage, initialPerPag
         </div>
       </section>
 
-      {/* DataTable panel */}
+      {/* DataTable panel — two-column layout */}
       <section className="dp-panel">
+        <div className="dp-body-layout">
 
-        {/* ── DataTable toolbar: title left, search right ── */}
-        <div className="dt-toolbar">
-          <div className="dt-toolbar-left">
-            <h2 className="dt-title">Daftar Riwayat Pembayaran</h2>
-          </div>
-          <div className="dt-toolbar-right">
-            <div className="dt-search-wrap">
-              <span className="dt-search-icon">⌕</span>
-              <input
-                id="dt-search"
-                type="search"
-                className="dt-search"
-                placeholder="Cari wajib pajak, NOP, STS…"
-                value={search}
-                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                disabled={!detailFetched}
-              />
+          {/* ── Left: Top Pembayar ─────────────────────────────── */}
+          <aside className="dp-top-pembayar-panel">
+            <div className="tp-header">
+              <h2 className="tp-title">Top Pembayar</h2>
+              <span className="tp-subtitle">10 Terbesar Tahun {year}</span>
             </div>
-            <label className="dt-per-page-label">
-              Show
-              <select
-                className="dt-per-page-select"
-                value={perPage}
-                onChange={(e) => { setPerPage(Number(e.target.value)); setPage(1); }}
-                disabled={!detailFetched}
-              >
-                {PER_PAGE_OPTIONS.map((opt) => (
-                  <option key={opt} value={opt}>{opt}</option>
-                ))}
-              </select>
-              entries
-            </label>
-          </div>
-        </div>
-
-        {/* Notices */}
-        {detailError && <NoticeCard title="Data tidak dapat dimuat" description={detailError} />}
-
-        {/* Table */}
-        <div className="dp-table-wrap">
-          <table className="dt-table">
-            <colgroup>
-              <col style={{ width: "16%" }} />
-              <col style={{ width: "22%" }} />
-              <col style={{ width: "29%" }} />
-              <col style={{ width: "13%" }} />
-              <col style={{ width: "20%" }} />
-            </colgroup>
-            <thead>
-              <tr>
-                <th className="dt-th dt-th-sortable" onClick={() => handleColSort("tgl_bayar")}>
-                  <span className="dt-th-inner">
-                    Tanggal & Channel
-                    <SortIcon column="tgl_bayar" sortBy={sortBy} sortDir={sortDir} />
-                  </span>
-                </th>
-                <th className="dt-th dt-th-sortable" onClick={() => handleColSort("no_sts")}>
-                  <span className="dt-th-inner">
-                    STS / NOP
-                    <SortIcon column="no_sts" sortBy={sortBy} sortDir={sortDir} />
-                  </span>
-                </th>
-                <th className="dt-th dt-th-sortable" onClick={() => handleColSort("nama_pemilik")}>
-                  <span className="dt-th-inner">
-                    Wajib Pajak
-                    <SortIcon column="nama_pemilik" sortBy={sortBy} sortDir={sortDir} />
-                  </span>
-                </th>
-                <th className="dt-th dt-th-sortable dt-th-right" onClick={() => handleColSort("nilai")}>
-                  <span className="dt-th-inner" style={{ justifyContent: "flex-end" }}>
-                    Rincian Bayar
-                    <SortIcon column="nilai" sortBy={sortBy} sortDir={sortDir} />
-                  </span>
-                </th>
-                <th className="dt-th dt-th-sortable dt-th-right" onClick={() => handleColSort("total_bayar")}>
-                  <span className="dt-th-inner" style={{ justifyContent: "flex-end" }}>
-                    Total Bayar
-                    <SortIcon column="total_bayar" sortBy={sortBy} sortDir={sortDir} />
-                  </span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
+            <div className="tp-list-wrap">
               {detailLoading ? (
-                Array.from({ length: perPage }).map((_, i) => (
-                  <tr key={i} className="dt-skeleton-row">
-                    <td><Skeleton width="7rem" /></td>
-                    <td><Skeleton width="9rem" /></td>
-                    <td><Skeleton width="8rem" /></td>
-                    <td><Skeleton width="5rem" /></td>
-                    <td style={{ textAlign: "right" }}><Skeleton width="6rem" /></td>
-                  </tr>
+                Array.from({ length: 10 }).map((_, i) => (
+                  <div key={i} className="tp-item tp-item-skeleton">
+                    <span className="tp-rank tp-rank-skeleton">{i + 1}</span>
+                    <div className="tp-item-body">
+                      <Skeleton width="9rem" height="0.8em" />
+                      <Skeleton width="5rem" height="0.7em" />
+                    </div>
+                    <div className="tp-item-amount">
+                      <Skeleton width="5rem" height="0.85em" />
+                    </div>
+                  </div>
                 ))
-              ) : pagedRows.length ? (
-                pagedRows.map((payment, i) => (
-                  <PaymentRow key={buildPaymentKey(payment, pageStart + i)} payment={payment} />
-                ))
+              ) : topPembayar.length === 0 ? (
+                <div className="tp-empty">Data tidak tersedia</div>
               ) : (
-                <tr>
-                  <td colSpan={5} className="dt-empty">
-                    {search ? `Tidak ada data yang cocok dengan "${search}"` : "Belum ada transaksi."}
-                  </td>
-                </tr>
+                topPembayar.map((item, i) => (
+                  <TopPembayarRow key={i} item={item} rank={i + 1} />
+                ))
               )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* ── DataTable footer: info left, pagination right ── */}
-        {(detailFetched || detailLoading) && (
-          <div className="dt-footer">
-            <span className="dt-info">
-              {detailLoading
-                ? <Skeleton width="12rem" />
-                : totalCount === 0
-                  ? "Tidak ada data"
-                  : `Menampilkan ${pageStart + 1}–${pageEnd} dari ${formatRupiah(totalCount)} entri${search ? ` (difilter dari ${formatRupiah(allRows.length)} total)` : ""}`}
-            </span>
-            <div className="dt-pagination">
-              <button
-                type="button"
-                className={`dt-page-btn ${!hasPrev ? "dt-page-btn-disabled" : ""}`}
-                onClick={() => { if (hasPrev) setPage((p) => Math.max(p - 1, 1)); }}
-                disabled={!hasPrev}
-              >‹ Sebelumnya</button>
-
-              {/* Page number pills */}
-              <div className="dt-page-pills">
-                {buildPagePills(safePage, totalPages).map((item, i) =>
-                  item === "…" ? (
-                    <span key={`ellipsis-${i}`} className="dt-page-ellipsis">…</span>
-                  ) : (
-                    <button
-                      key={item}
-                      type="button"
-                      className={`dt-page-pill ${item === safePage ? "dt-page-pill-active" : ""}`}
-                      onClick={() => setPage(item as number)}
-                    >{item}</button>
-                  ),
-                )}
-              </div>
-
-              <button
-                type="button"
-                className={`dt-page-btn ${!hasNext ? "dt-page-btn-disabled" : ""}`}
-                onClick={() => { if (hasNext) setPage((p) => p + 1); }}
-                disabled={!hasNext}
-              >Berikutnya ›</button>
             </div>
-          </div>
-        )}
+          </aside>
 
+          {/* ── Right: Riwayat Pembayaran ──────────────────────── */}
+          <div className="dp-riwayat-panel">
+
+            {/* DataTable toolbar */}
+            <div className="dt-toolbar">
+              <div className="dt-toolbar-left">
+                <h2 className="dt-title">Riwayat Pembayaran Terbaru</h2>
+              </div>
+              <div className="dt-toolbar-right">
+                <div className="dt-search-wrap">
+                  <span className="dt-search-icon">⌕</span>
+                  <input
+                    id="dt-search"
+                    type="search"
+                    className="dt-search"
+                    placeholder="Cari wajib pajak, NPWPD, NOP, STS…"
+                    value={search}
+                    onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                    disabled={!detailFetched}
+                  />
+                </div>
+                <label className="dt-per-page-label">
+                  Show
+                  <select
+                    className="dt-per-page-select"
+                    value={perPage}
+                    onChange={(e) => { setPerPage(Number(e.target.value)); setPage(1); }}
+                    disabled={!detailFetched}
+                  >
+                    {PER_PAGE_OPTIONS.map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                  entries
+                </label>
+              </div>
+            </div>
+
+            {/* Notices */}
+            {detailError && <NoticeCard title="Data tidak dapat dimuat" description={detailError} />}
+
+            {/* Table scroll area */}
+            <div className="dp-table-wrap">
+              <table className="dt-table">
+                <colgroup>
+                  <col style={{ width: "16%" }} />
+                  <col style={{ width: "22%" }} />
+                  <col style={{ width: "29%" }} />
+                  <col style={{ width: "13%" }} />
+                  <col style={{ width: "20%" }} />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th className="dt-th dt-th-sortable" onClick={() => handleColSort("tgl_bayar")}>
+                      <span className="dt-th-inner">
+                        Tanggal &amp; Channel
+                        <SortIcon column="tgl_bayar" sortBy={sortBy} sortDir={sortDir} />
+                      </span>
+                    </th>
+                    <th className="dt-th dt-th-sortable" onClick={() => handleColSort("no_sts")}>
+                      <span className="dt-th-inner">
+                        STS / NOP
+                        <SortIcon column="no_sts" sortBy={sortBy} sortDir={sortDir} />
+                      </span>
+                    </th>
+                    <th className="dt-th dt-th-sortable" onClick={() => handleColSort("nama_pemilik")}>
+                      <span className="dt-th-inner">
+                        Wajib Pajak
+                        <SortIcon column="nama_pemilik" sortBy={sortBy} sortDir={sortDir} />
+                      </span>
+                    </th>
+                    <th className="dt-th dt-th-sortable dt-th-right" onClick={() => handleColSort("nilai")}>
+                      <span className="dt-th-inner" style={{ justifyContent: "flex-end" }}>
+                        Rincian Bayar
+                        <SortIcon column="nilai" sortBy={sortBy} sortDir={sortDir} />
+                      </span>
+                    </th>
+                    <th className="dt-th dt-th-sortable dt-th-right" onClick={() => handleColSort("total_bayar")}>
+                      <span className="dt-th-inner" style={{ justifyContent: "flex-end" }}>
+                        Total Bayar
+                        <SortIcon column="total_bayar" sortBy={sortBy} sortDir={sortDir} />
+                      </span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {detailLoading ? (
+                    Array.from({ length: perPage }).map((_, i) => (
+                      <tr key={i} className="dt-skeleton-row">
+                        <td><Skeleton width="7rem" /></td>
+                        <td><Skeleton width="9rem" /></td>
+                        <td><Skeleton width="8rem" /></td>
+                        <td><Skeleton width="5rem" /></td>
+                        <td style={{ textAlign: "right" }}><Skeleton width="6rem" /></td>
+                      </tr>
+                    ))
+                  ) : pagedRows.length ? (
+                    pagedRows.map((payment, i) => (
+                      <PaymentRow key={buildPaymentKey(payment, pageStart + i)} payment={payment} />
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={5} className="dt-empty">
+                        {search ? `Tidak ada data yang cocok dengan "${search}"` : "Belum ada transaksi."}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* DataTable footer */}
+            {(detailFetched || detailLoading) && (
+              <div className="dt-footer">
+                <span className="dt-info">
+                  {detailLoading
+                    ? <Skeleton width="12rem" />
+                    : totalCount === 0
+                      ? "Tidak ada data"
+                      : `Menampilkan ${pageStart + 1}–${pageEnd} dari ${formatRupiah(totalCount)} entri${search ? ` (difilter dari ${formatRupiah(allRows.length)} total)` : ""}`}
+                </span>
+                <div className="dt-pagination">
+                  <button
+                    type="button"
+                    className={`dt-page-btn ${!hasPrev ? "dt-page-btn-disabled" : ""}`}
+                    onClick={() => { if (hasPrev) setPage((p) => Math.max(p - 1, 1)); }}
+                    disabled={!hasPrev}
+                  >‹ Sebelumnya</button>
+
+                  <div className="dt-page-pills">
+                    {buildPagePills(safePage, totalPages).map((item, i) =>
+                      item === "…" ? (
+                        <span key={`ellipsis-${i}`} className="dt-page-ellipsis">…</span>
+                      ) : (
+                        <button
+                          key={item}
+                          type="button"
+                          className={`dt-page-pill ${item === safePage ? "dt-page-pill-active" : ""}`}
+                          onClick={() => setPage(item as number)}
+                        >{item}</button>
+                      ),
+                    )}
+                  </div>
+
+                  <button
+                    type="button"
+                    className={`dt-page-btn ${!hasNext ? "dt-page-btn-disabled" : ""}`}
+                    onClick={() => { if (hasNext) setPage((p) => p + 1); }}
+                    disabled={!hasNext}
+                  >Berikutnya ›</button>
+                </div>
+              </div>
+            )}
+
+          </div>{/* end dp-riwayat-panel */}
+        </div>{/* end dp-body-layout */}
       </section>
     </div>
   );
@@ -438,6 +473,43 @@ function NoticeCard({ title, description }: { title: string; description: string
     <div className="detail-page-notice">
       <h3>{title}</h3>
       <p>{description}</p>
+    </div>
+  );
+}
+
+const RANK_COLORS = [
+  { bg: "rgba(251,191,36,0.18)", border: "rgba(251,191,36,0.55)", text: "#fbbf24" },   // #1 gold
+  { bg: "rgba(148,163,184,0.14)", border: "rgba(148,163,184,0.4)", text: "#cbd5e1" },  // #2 silver
+  { bg: "rgba(180,120,60,0.15)", border: "rgba(180,120,60,0.4)", text: "#c97c3a" },    // #3 bronze
+];
+
+function TopPembayarRow({ item, rank }: { item: TaxTopPembayarItem; rank: number }) {
+  const colors = RANK_COLORS[rank - 1] ?? null;
+  return (
+    <div className="tp-item">
+      <span
+        className="tp-rank"
+        style={colors ? {
+          background: colors.bg,
+          border: `1px solid ${colors.border}`,
+          color: colors.text,
+        } : undefined}
+      >
+        {rank}
+      </span>
+      <div className="tp-item-body">
+        <strong className="tp-item-name">{item.nama_pemilik ?? "-"}</strong>
+        <span className="tp-item-meta">
+          {item.jumlah_transaksi} transaksi
+          {item.no_pokok_wp ? ` · ${item.no_pokok_wp}` : ""}
+        </span>
+      </div>
+      <div className="tp-item-amount">
+        <span className="tp-item-total">Rp {formatRupiah(item.total_bayar)}</span>
+        {item.total_denda > 0 && (
+          <span className="tp-item-denda">+denda Rp {formatRupiah(item.total_denda)}</span>
+        )}
+      </div>
     </div>
   );
 }
