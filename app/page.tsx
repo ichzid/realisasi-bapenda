@@ -2,6 +2,9 @@ import { DashboardClient } from "./components/DashboardClient";
 import { getSummaryData } from "./lib/bapenda-api";
 import type { TaxSummaryResponse } from "./lib/bapenda-contract";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const EMPTY_DATA: TaxSummaryResponse = {
   success: false,
   message: "",
@@ -18,7 +21,7 @@ const EMPTY_DATA: TaxSummaryResponse = {
 export default async function Home() {
   let data: TaxSummaryResponse;
   try {
-    data = await getSummaryData(undefined, { revalidate: 15 });
+    data = await getSummaryData(undefined, { cache: "no-store" });
   } catch {
     data = EMPTY_DATA;
   }
