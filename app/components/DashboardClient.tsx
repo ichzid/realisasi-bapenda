@@ -7,6 +7,8 @@ import { LiveClock } from "./LiveClock";
 import { useCountUp } from "../hooks/useCountUp";
 import type { TaxSummaryResponse } from "../lib/bapenda-contract";
 
+const POLL_INTERVAL_MS = 5_000;
+
 function formatRupiah(n: number): string {
   return n.toLocaleString("id-ID");
 }
@@ -85,18 +87,17 @@ function FlashRow({ children, changed }: { children: React.ReactNode; changed: b
   return <tr className={`transition-colors border-b border-panel-border/30 ${changed ? "row-flash" : ""}`}>{children}</tr>;
 }
 
-export function DashboardClient({ initialData, initialError }: { initialData: TaxSummaryResponse | null; initialError: string | null }) {
-  const [data, setData] = useState<TaxSummaryResponse | null>(initialData);
-  const [error, setError] = useState<string | null>(initialError);
-  const [loading, setLoading] = useState(!initialData);
+export function DashboardClient({ initialData }: { initialData: TaxSummaryResponse }) {
+  const [data, setData] = useState<TaxSummaryResponse>(initialData);
   const [changedRows, setChangedRows] = useState<Set<number>>(new Set());
-  const prevDataRef = useRef<TaxSummaryResponse | null>(initialData);
+  const prevDataRef = useRef<TaxSummaryResponse>(initialData);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
-      setError(null);
-      const res = await fetch("/api/realisasi-pajak", { cache: "no-store" });
+      const res = await fetch("/api/realisasi-pajak", {
+        cache: "no-store",
+      });
 
       if (!res.ok) return;
 
@@ -104,7 +105,7 @@ export function DashboardClient({ initialData, initialError }: { initialData: Ta
       const changed = new Set<number>();
 
       fresh.rincian.forEach((row, index) => {
-        const prev = prevDataRef.current?.rincian[index];
+        const prev = prevDataRef.current.rincian[index];
         if (!prev || prev.realisasi !== row.realisasi || prev.target !== row.target) {
           changed.add(index);
         }
@@ -114,7 +115,6 @@ export function DashboardClient({ initialData, initialError }: { initialData: Ta
       startTransition(() => {
         setData(fresh);
         setChangedRows(changed);
-        setError(null);
       });
       setLastUpdated(new Date());
 
@@ -123,56 +123,20 @@ export function DashboardClient({ initialData, initialError }: { initialData: Ta
       }
     } catch (error) {
       console.error("Polling error:", error);
-    } finally {
-      setLoading(false);
     }
   }, []);
 
-  // Fetch segera saat komponen mount, lalu polling tiap 5 detik
   useEffect(() => {
-    fetchData();
-    const id = setInterval(fetchData, 5000);
-    return () => clearInterval(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const intervalId = setInterval(fetchData, POLL_INTERVAL_MS);
+    return () => clearInterval(intervalId);
+  }, [fetchData]);
 
-  const ringkasan = data?.ringkasan ?? { total_target: 0, total_realisasi: 0, persentase_capaian: 0, selisih_anggaran: 0 };
-  const rincian = data?.rincian ?? [];
-  const tahun = data?.tahun ?? "—";
+  const { ringkasan, rincian, tahun } = data;
 
   return (
     <div className="dashboard-wrapper" style={{ padding: "1.1vh 1.2vw" }}>
       <div className="bg-accent-orb" />
       <div className="glow-line" />
-
-      {error && (
-        <div style={{ background: "rgba(239, 68, 68, 0.15)", border: "1px solid rgba(239, 68, 68, 0.4)", borderRadius: "0.5rem", padding: "0.8rem 1.2rem", marginBottom: "1vh", color: "#fca5a5", textAlign: "center", zIndex: 1, position: "relative" }}>
-          {error}
-        </div>
-      )}
-
-      {loading ? (
-        <div style={{ textAlign: "center", padding: "5vh 0", zIndex: 1, position: "relative" }}>
-          <div style={{ fontSize: "clamp(0.9rem, 1.1vw, 1.2rem)", color: "var(--text-secondary)", marginBottom: "1.5rem", fontWeight: 500 }}>
-            Memuat data realisasi...
-          </div>
-          <div style={{ display: "flex", justifyContent: "center", gap: "clamp(0.5rem, 1vw, 1rem)", flexWrap: "wrap" }}>
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                style={{
-                  width: "clamp(200px, 30%, 320px)",
-                  height: "80px",
-                  borderRadius: "0.75rem",
-                  background: "rgba(255,255,255,0.04)",
-                  animation: `skeletonPulse 1.5s ease-in-out ${i * 0.2}s infinite`,
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      ) : (
-        <>
 
       <header
         className="flex justify-between items-start"
@@ -359,8 +323,6 @@ export function DashboardClient({ initialData, initialError }: { initialData: Ta
           <LegendItem color="bg-accent-red" label="< 40% Rendah" />
         </div>
       </footer>
-        </>
-      )}
     </div>
   );
 }
