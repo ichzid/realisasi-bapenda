@@ -14,16 +14,7 @@ interface ApiFetchOptions {
   revalidate?: number;
 }
 
-function sanitizeBaseUrl(value: string): string {
-  return value.trim().replace(/^[`'"\s]+|[`'"\s]+$/g, "");
-}
-
 function getApiBaseUrl(): string {
-  const envValue = process.env.BAPENDA_API_BASE_URL ?? process.env.NEXT_PUBLIC_BAPENDA_API_BASE_URL;
-  const candidate = envValue ? sanitizeBaseUrl(envValue) : "";
-  if (candidate && /^https?:\/\//i.test(candidate)) {
-    return candidate;
-  }
   return API_BASE_URL;
 }
 
