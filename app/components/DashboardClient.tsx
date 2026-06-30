@@ -130,6 +130,8 @@ export function DashboardClient({ initialData, initialError }: { initialData: Ta
   }, []);
 
   useEffect(() => {
+    // Fetch langsung saat mount, lalu polling tiap 5 detik
+    fetchData();
     const intervalId = setInterval(fetchData, POLL_INTERVAL_MS);
     return () => clearInterval(intervalId);
   }, [fetchData]);
