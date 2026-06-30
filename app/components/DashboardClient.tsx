@@ -127,12 +127,13 @@ export function DashboardClient({ initialData, initialError }: { initialData: Ta
     }
   }, []);
 
+  // Fetch segera saat komponen mount, lalu polling tiap 5 detik
   useEffect(() => {
-    // Fetch langsung saat mount, lalu polling tiap 5 detik
     fetchData();
-    const intervalId = setInterval(fetchData, POLL_INTERVAL_MS);
-    return () => clearInterval(intervalId);
-  }, [fetchData]);
+    const id = setInterval(fetchData, 5000);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const ringkasan = data?.ringkasan ?? { total_target: 0, total_realisasi: 0, persentase_capaian: 0, selisih_anggaran: 0 };
   const rincian = data?.rincian ?? [];
