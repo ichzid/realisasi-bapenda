@@ -1,7 +1,18 @@
-"use client";
+export const revalidate = 15;
 
 import { DashboardClient } from "./components/DashboardClient";
+import { getSummaryData } from "./lib/bapenda-api";
+import type { TaxSummaryResponse } from "./lib/bapenda-contract";
 
-export default function Home() {
-  return <DashboardClient initialData={null} initialError={null} />;
+export default async function Home() {
+  let data: TaxSummaryResponse | null = null;
+  let error: string | null = null;
+
+  try {
+    data = await getSummaryData(undefined, { revalidate: 15 });
+  } catch {
+    error = "API tidak tersedia. Data akan dimuat ulang otomatis.";
+  }
+
+  return <DashboardClient initialData={data} initialError={error} />;
 }
