@@ -72,13 +72,15 @@ export async function getSummaryData(
     searchParams.set("tahun", String(tahun));
   }
 
-  const response = await fetch(
-    buildBackendUrl("realisasi-pajak", searchParams),
-    buildFetchInit(options),
-  );
+  const targetUrl = buildBackendUrl("realisasi-pajak", searchParams);
+  const response = await fetch(targetUrl, buildFetchInit(options));
 
   if (!response.ok) {
-    throw new Error(buildHttpErrorMessage(response.status, "Gagal mengambil data realisasi pajak."));
+    const bodyText = await response.text().catch(() => "");
+    const snippet = bodyText.slice(0, 300);
+    throw new Error(
+      `Upstream ${response.status} from ${targetUrl}: ${snippet || buildHttpErrorMessage(response.status, "Gagal mengambil data realisasi pajak.")}`,
+    );
   }
 
   const payload = await response.json();
