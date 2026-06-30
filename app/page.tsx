@@ -1,4 +1,4 @@
-export const revalidate = 15;
+export const dynamic = "force-dynamic";
 
 import { DashboardClient } from "./components/DashboardClient";
 import { getSummaryData } from "./lib/bapenda-api";
@@ -9,7 +9,7 @@ export default async function Home() {
   let error: string | null = null;
 
   try {
-    data = await getSummaryData(undefined, { revalidate: 15 });
+    data = await getSummaryData(undefined, { cache: "no-store" });
   } catch {
     error = "API tidak tersedia. Data akan dimuat ulang otomatis.";
   }
