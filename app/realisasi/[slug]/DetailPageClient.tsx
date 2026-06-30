@@ -23,8 +23,6 @@ type SortDir = "asc" | "desc";
 
 const PER_PAGE_OPTIONS = [10, 25, 50];
 
-const API_BASE = process.env.NEXT_PUBLIC_BAPENDA_API_BASE_URL ?? "https://api-bapenda.ichmal.my.id/api";
-
 /* ── Helpers ─────────────────────────────────────────────────────────── */
 function formatRupiah(n: number): string {
   return n.toLocaleString("id-ID");
@@ -97,7 +95,7 @@ export function DetailPageClient({ slug, initialYear, initialPage, initialPerPag
   /* ── Fetch ONE page (server-side pagination) ─────────────────────── */
   const fetchPage = useCallback(async (targetPage: number, targetPerPage: number, signal: AbortSignal) => {
     const res = await fetch(
-      `${API_BASE}/realisasi-pajak/${slug}/detail?tahun=${year}&page=${targetPage}&per_page=${targetPerPage}`,
+      `/api/realisasi-pajak/${slug}/detail?tahun=${year}&page=${targetPage}&per_page=${targetPerPage}`,
       { cache: "no-store", signal },
     );
     const payload = (await res.json()) as TaxDetailResponse | ApiErrorResponse;

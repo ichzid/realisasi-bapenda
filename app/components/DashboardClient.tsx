@@ -7,7 +7,6 @@ import { LiveClock } from "./LiveClock";
 import { useCountUp } from "../hooks/useCountUp";
 import type { TaxSummaryResponse } from "../lib/bapenda-contract";
 
-const API_BASE = process.env.NEXT_PUBLIC_BAPENDA_API_BASE_URL ?? "https://api-bapenda.ichmal.my.id/api";
 const POLL_INTERVAL_MS = 5_000;
 
 function formatRupiah(n: number): string {
@@ -98,7 +97,7 @@ export function DashboardClient({ initialData, initialError }: { initialData: Ta
   const fetchData = useCallback(async () => {
     try {
       setError(null);
-      const res = await fetch(`${API_BASE}/realisasi-pajak`, { cache: "no-store" });
+      const res = await fetch("/api/realisasi-pajak", { cache: "no-store" });
 
       if (!res.ok) return;
 
