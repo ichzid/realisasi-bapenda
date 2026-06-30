@@ -285,7 +285,7 @@ function normalizeSummaryItem(payload: unknown): TaxSummaryItem | null {
     sumber_data: sumberData,
     detail_tersedia: detailTersedia,
     detail_endpoint: detailTersedia
-      ? asString(record?.detail_endpoint) ?? buildLocalDetailEndpoint(slug)
+      ? asString(record?.detail_endpoint) ?? buildApiEndpoint(slug)
       : null,
     target: asNumber(record?.target),
     realisasi: asNumber(record?.realisasi),
