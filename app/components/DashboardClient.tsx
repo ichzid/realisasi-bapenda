@@ -7,8 +7,6 @@ import { LiveClock } from "./LiveClock";
 import { useCountUp } from "../hooks/useCountUp";
 import type { TaxSummaryResponse } from "../lib/bapenda-contract";
 
-const POLL_INTERVAL_MS = 5_000;
-
 function formatRupiah(n: number): string {
   return n.toLocaleString("id-ID");
 }
@@ -90,6 +88,7 @@ function FlashRow({ children, changed }: { children: React.ReactNode; changed: b
 export function DashboardClient({ initialData, initialError }: { initialData: TaxSummaryResponse | null; initialError: string | null }) {
   const [data, setData] = useState<TaxSummaryResponse | null>(initialData);
   const [error, setError] = useState<string | null>(initialError);
+  const [loading, setLoading] = useState(!initialData);
   const [changedRows, setChangedRows] = useState<Set<number>>(new Set());
   const prevDataRef = useRef<TaxSummaryResponse | null>(initialData);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -124,6 +123,8 @@ export function DashboardClient({ initialData, initialError }: { initialData: Ta
       }
     } catch (error) {
       console.error("Polling error:", error);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -149,6 +150,29 @@ export function DashboardClient({ initialData, initialError }: { initialData: Ta
           {error}
         </div>
       )}
+
+      {loading ? (
+        <div style={{ textAlign: "center", padding: "5vh 0", zIndex: 1, position: "relative" }}>
+          <div style={{ fontSize: "clamp(0.9rem, 1.1vw, 1.2rem)", color: "var(--text-secondary)", marginBottom: "1.5rem", fontWeight: 500 }}>
+            Memuat data realisasi...
+          </div>
+          <div style={{ display: "flex", justifyContent: "center", gap: "clamp(0.5rem, 1vw, 1rem)", flexWrap: "wrap" }}>
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                style={{
+                  width: "clamp(200px, 30%, 320px)",
+                  height: "80px",
+                  borderRadius: "0.75rem",
+                  background: "rgba(255,255,255,0.04)",
+                  animation: `skeletonPulse 1.5s ease-in-out ${i * 0.2}s infinite`,
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      ) : (
+        <>
 
       <header
         className="flex justify-between items-start"
@@ -335,6 +359,8 @@ export function DashboardClient({ initialData, initialError }: { initialData: Ta
           <LegendItem color="bg-accent-red" label="< 40% Rendah" />
         </div>
       </footer>
+        </>
+      )}
     </div>
   );
 }

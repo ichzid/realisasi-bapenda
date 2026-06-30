@@ -2249,5 +2249,11 @@ body {
   pointer-events: none;
 }
 
+/* ─── Skeleton pulse animation ───── */
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
 
 
