@@ -127,6 +127,7 @@ export function DashboardClient({ initialData }: { initialData: TaxSummaryRespon
   }, []);
 
   useEffect(() => {
+    fetchData();
     const intervalId = setInterval(fetchData, POLL_INTERVAL_MS);
     return () => clearInterval(intervalId);
   }, [fetchData]);
