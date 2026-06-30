@@ -87,14 +87,16 @@ function FlashRow({ children, changed }: { children: React.ReactNode; changed: b
   return <tr className={`transition-colors border-b border-panel-border/30 ${changed ? "row-flash" : ""}`}>{children}</tr>;
 }
 
-export function DashboardClient({ initialData }: { initialData: TaxSummaryResponse }) {
-  const [data, setData] = useState<TaxSummaryResponse>(initialData);
+export function DashboardClient({ initialData, initialError }: { initialData: TaxSummaryResponse | null; initialError: string | null }) {
+  const [data, setData] = useState<TaxSummaryResponse | null>(initialData);
+  const [error, setError] = useState<string | null>(initialError);
   const [changedRows, setChangedRows] = useState<Set<number>>(new Set());
-  const prevDataRef = useRef<TaxSummaryResponse>(initialData);
+  const prevDataRef = useRef<TaxSummaryResponse | null>(initialData);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
+      setError(null);
       const res = await fetch("/api/realisasi-pajak", {
         cache: "no-store",
       });
@@ -105,7 +107,7 @@ export function DashboardClient({ initialData }: { initialData: TaxSummaryRespon
       const changed = new Set<number>();
 
       fresh.rincian.forEach((row, index) => {
-        const prev = prevDataRef.current.rincian[index];
+        const prev = prevDataRef.current?.rincian[index];
         if (!prev || prev.realisasi !== row.realisasi || prev.target !== row.target) {
           changed.add(index);
         }
@@ -115,6 +117,7 @@ export function DashboardClient({ initialData }: { initialData: TaxSummaryRespon
       startTransition(() => {
         setData(fresh);
         setChangedRows(changed);
+        setError(null);
       });
       setLastUpdated(new Date());
 
@@ -131,12 +134,20 @@ export function DashboardClient({ initialData }: { initialData: TaxSummaryRespon
     return () => clearInterval(intervalId);
   }, [fetchData]);
 
-  const { ringkasan, rincian, tahun } = data;
+  const ringkasan = data?.ringkasan;
+  const rincian = data?.rincian ?? [];
+  const tahun = data?.tahun ?? "—";
 
   return (
     <div className="dashboard-wrapper" style={{ padding: "1.1vh 1.2vw" }}>
       <div className="bg-accent-orb" />
       <div className="glow-line" />
+
+      {error && (
+        <div style={{ background: "rgba(239, 68, 68, 0.15)", border: "1px solid rgba(239, 68, 68, 0.4)", borderRadius: "0.5rem", padding: "0.8rem 1.2rem", marginBottom: "1vh", color: "#fca5a5", textAlign: "center", zIndex: 1, position: "relative" }}>
+          {error}
+        </div>
+      )}
 
       <header
         className="flex justify-between items-start"
