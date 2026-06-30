@@ -134,7 +134,7 @@ export function DashboardClient({ initialData, initialError }: { initialData: Ta
     return () => clearInterval(intervalId);
   }, [fetchData]);
 
-  const ringkasan = data?.ringkasan;
+  const ringkasan = data?.ringkasan ?? { total_target: 0, total_realisasi: 0, persentase_capaian: 0, selisih_anggaran: 0 };
   const rincian = data?.rincian ?? [];
   const tahun = data?.tahun ?? "—";
 
