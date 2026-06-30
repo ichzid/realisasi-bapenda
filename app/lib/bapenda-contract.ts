@@ -234,9 +234,14 @@ function slugifyJenisPajak(value: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-export function buildLocalDetailEndpoint(slug: string): string {
-  return `/api/realisasi-pajak/${slug}/detail`;
+function buildApiEndpoint(slug: string): string {
+  const base = typeof process !== "undefined" && process.env.NEXT_PUBLIC_BAPENDA_API_BASE_URL
+    ? process.env.NEXT_PUBLIC_BAPENDA_API_BASE_URL
+    : "https://api-bapenda.ichmal.my.id/api";
+  return `${base}/realisasi-pajak/${slug}/detail`;
 }
+
+export { buildApiEndpoint as buildLocalDetailEndpoint };
 
 export function normalizeSummaryResponse(payload: unknown): TaxSummaryResponse {
   const record = asRecord(payload);
