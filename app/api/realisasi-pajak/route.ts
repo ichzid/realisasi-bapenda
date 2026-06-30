@@ -22,7 +22,7 @@ export async function GET(request: Request) {
         success: false,
         message: errorMessage,
         cause: errorCause,
-        target_url: process.env.BAPENDA_API_BASE_URL ?? process.env.NEXT_PUBLIC_BAPENDA_API_BASE_URL ?? "https://api-bapenda.ichmal.my.id/api",
+        target_url: "https://api-bapenda.ichmal.my.id/api",
       },
       { status: 502 },
     );

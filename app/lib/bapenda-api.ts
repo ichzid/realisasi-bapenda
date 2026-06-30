@@ -7,15 +7,24 @@ import {
   type TaxSummaryResponse,
 } from "./bapenda-contract";
 
-const DEFAULT_API_BASE_URL = "https://api-bapenda.ichmal.my.id/api";
+const API_BASE_URL = "https://api-bapenda.ichmal.my.id/api";
 
 interface ApiFetchOptions {
   cache?: RequestCache;
   revalidate?: number;
 }
 
+function sanitizeBaseUrl(value: string): string {
+  return value.trim().replace(/^[`'"\s]+|[`'"\s]+$/g, "");
+}
+
 function getApiBaseUrl(): string {
-  return process.env.BAPENDA_API_BASE_URL ?? process.env.NEXT_PUBLIC_BAPENDA_API_BASE_URL ?? DEFAULT_API_BASE_URL;
+  const envValue = process.env.BAPENDA_API_BASE_URL ?? process.env.NEXT_PUBLIC_BAPENDA_API_BASE_URL;
+  const candidate = envValue ? sanitizeBaseUrl(envValue) : "";
+  if (candidate && /^https?:\/\//i.test(candidate)) {
+    return candidate;
+  }
+  return API_BASE_URL;
 }
 
 function buildBackendUrl(pathname: string, searchParams?: URLSearchParams): string {
