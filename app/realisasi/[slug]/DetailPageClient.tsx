@@ -21,8 +21,7 @@ interface DetailPageClientProps {
 type SortBy = "tgl_bayar" | "no_sts" | "nama_pemilik" | "nilai" | "total_bayar";
 type SortDir = "asc" | "desc";
 
-const FETCH_ALL_PER_PAGE = 100;
-const PER_PAGE_OPTIONS = [10, 25, 50, 100];
+const PER_PAGE_OPTIONS = [10, 25, 50];
 
 /* ── Helpers ─────────────────────────────────────────────────────────── */
 function formatRupiah(n: number): string {
@@ -81,70 +80,58 @@ export function DetailPageClient({ slug, initialYear, initialPage, initialPerPag
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [search, setSearch] = useState("");
 
-  /* Detail (fetch all, sort/paginate client-side) */
-  const [allRows, setAllRows] = useState<TaxDetailPaymentItem[]>([]);
+  /* Detail (server-side pagination — fetch per-halaman, bukan semua) */
+  const [rows, setRows] = useState<TaxDetailPaymentItem[]>([]);
   const [topPembayar, setTopPembayar] = useState<TaxTopPembayarItem[]>([]);
   const [jenisPajak, setJenisPajak] = useState<TaxDetailResponse["data"]["jenis_pajak"] | null>(null);
   const [ringkasan, setRingkasan] = useState<DetailRingkasan | null>(null);
   const [detailLoading, setDetailLoading] = useState(true);
   const [detailError, setDetailError] = useState<string | null>(null);
   const [detailFetched, setDetailFetched] = useState(false);
+  const paginationRef = useRef({ total: 0, last_page: 0, has_more: false });
 
   const firstLoadRef = useRef(true);
 
-  /* ── Fetch ALL rows (one-shot, parallel if capped) ───────────────── */
-  const fetchAllRows = useCallback(async (signal: AbortSignal) => {
-    setDetailLoading(true);
-    setDetailError(null);
-    setDetailFetched(false);
-
+  /* ── Fetch ONE page (server-side pagination) ─────────────────────── */
+  const fetchPage = useCallback(async (targetPage: number, targetPerPage: number, signal: AbortSignal) => {
     const res = await fetch(
-      `/api/realisasi-pajak/${slug}/detail?tahun=${year}&page=1&per_page=${FETCH_ALL_PER_PAGE}`,
+      `/api/realisasi-pajak/${slug}/detail?tahun=${year}&page=${targetPage}&per_page=${targetPerPage}`,
       { cache: "no-store", signal },
     );
     const payload = (await res.json()) as TaxDetailResponse | ApiErrorResponse;
     if (!res.ok || payload.success === false) {
       throw new Error((payload as ApiErrorResponse).message ?? "Gagal memuat detail.");
     }
+    const data = payload as TaxDetailResponse;
 
-    const first = payload as TaxDetailResponse;
-    let collected: TaxDetailPaymentItem[] = [...first.data.pembayaran.data];
-
-    if (first.data.pembayaran.pagination.has_more_pages) {
-      const lastPage = first.data.pembayaran.pagination.last_page;
-      const pages = await Promise.all(
-        Array.from({ length: lastPage - 1 }, (_, i) =>
-          fetch(`/api/realisasi-pajak/${slug}/detail?tahun=${year}&page=${i + 2}&per_page=${FETCH_ALL_PER_PAGE}`, {
-            cache: "no-store", signal,
-          }).then(async (r) => {
-            const p = (await r.json()) as TaxDetailResponse | ApiErrorResponse;
-            if (!r.ok || p.success === false) return [] as TaxDetailPaymentItem[];
-            return (p as TaxDetailResponse).data.pembayaran.data;
-          }),
-        ),
-      );
-      for (const rows of pages) collected = [...collected, ...rows];
+    // Simpan metadata yang tidak berubah
+    if (!detailFetched) {
+      setJenisPajak(data.data.jenis_pajak);
+      setRingkasan(data.data.ringkasan);
+      setTopPembayar(data.data.top_pembayar ?? []);
+      setDetailFetched(true);
     }
-
-    setAllRows(collected);
-    setJenisPajak(first.data.jenis_pajak);
-    setRingkasan(first.data.ringkasan);
-    setTopPembayar(first.data.top_pembayar ?? []);
-    setDetailFetched(true);
-    setDetailLoading(false);
-  }, [slug, year]);
+    setRows(data.data.pembayaran.data);
+    paginationRef.current = {
+      total: data.data.pembayaran.pagination.total,
+      last_page: data.data.pembayaran.pagination.last_page,
+      has_more: data.data.pembayaran.pagination.has_more_pages,
+    };
+  }, [slug, year, detailFetched]);
 
   useEffect(() => {
     const controller = new AbortController();
+    setDetailLoading(true);
+    setDetailError(null);
     void Promise.resolve()
-      .then(() => fetchAllRows(controller.signal))
+      .then(() => fetchPage(page, perPage, controller.signal))
       .catch((err: unknown) => {
         if (err instanceof Error && err.name === "AbortError") return;
         setDetailError(err instanceof Error ? err.message : "Gagal memuat detail.");
-        setDetailLoading(false);
-      });
+      })
+      .finally(() => setDetailLoading(false));
     return () => controller.abort();
-  }, [fetchAllRows]);
+  }, [fetchPage, page, perPage]);
 
   /* ── Sync URL ────────────────────────────────────────────────────── */
   useEffect(() => {
@@ -155,9 +142,9 @@ export function DetailPageClient({ slug, initialYear, initialPage, initialPerPag
 
   /* ── Search filter ───────────────────────────────────────────────── */
   const filteredRows = useMemo(() => {
-    if (!search.trim()) return allRows;
+    if (!search.trim()) return rows;
     const q = search.toLowerCase();
-    return allRows.filter(
+    return rows.filter(
       (r) =>
         (r.nama_pemilik ?? "").toLowerCase().includes(q) ||
         (r.no_pokok_wp ?? "").toLowerCase().includes(q) ||
@@ -166,7 +153,7 @@ export function DetailPageClient({ slug, initialYear, initialPage, initialPerPag
         String(r.total_bayar).includes(q) ||
         String(r.nilai).includes(q),
     );
-  }, [allRows, search]);
+  }, [rows, search]);
 
   /* ── Sort ────────────────────────────────────────────────────────── */
   const sortedRows = useMemo(() => {
@@ -188,14 +175,12 @@ export function DetailPageClient({ slug, initialYear, initialPage, initialPerPag
   }, [filteredRows, sortBy, sortDir]);
 
   /* ── Pagination ──────────────────────────────────────────────────── */
-  const totalCount    = sortedRows.length;
-  const totalPages    = Math.max(1, Math.ceil(totalCount / perPage));
-  const safePage      = Math.min(page, totalPages);
-  const pageStart     = (safePage - 1) * perPage;
-  const pageEnd       = Math.min(pageStart + perPage, totalCount);
-  const pagedRows     = useMemo(() => sortedRows.slice(pageStart, pageEnd), [sortedRows, pageStart, pageEnd]);
+  const totalCount    = paginationRef.current.total;
+  const totalPages    = paginationRef.current.last_page;
+  const safePage      = page;
+  const pagedRows     = sortedRows; // sudah per-halaman dari server
   const hasPrev       = safePage > 1;
-  const hasNext       = safePage < totalPages;
+  const hasNext       = paginationRef.current.has_more;
 
   /* ── Metrics ─────────────────────────────────────────────────────── */
   const targetValue    = ringkasan?.target                  ?? 0;
@@ -379,7 +364,7 @@ export function DetailPageClient({ slug, initialYear, initialPage, initialPerPag
                     ))
                   ) : pagedRows.length ? (
                     pagedRows.map((payment, i) => (
-                      <PaymentRow key={buildPaymentKey(payment, pageStart + i)} payment={payment} />
+                      <PaymentRow key={buildPaymentKey(payment, i)} payment={payment} />
                     ))
                   ) : (
                     <tr>
@@ -400,7 +385,7 @@ export function DetailPageClient({ slug, initialYear, initialPage, initialPerPag
                     ? <Skeleton width="12rem" />
                     : totalCount === 0
                       ? "Tidak ada data"
-                      : `Menampilkan ${pageStart + 1}–${pageEnd} dari ${formatRupiah(totalCount)} entri${search ? ` (difilter dari ${formatRupiah(allRows.length)} total)` : ""}`}
+                      : `Menampilkan ${(page - 1) * perPage + 1}–${Math.min(page * perPage, totalCount)} dari ${formatRupiah(totalCount)} entri`}
                 </span>
                 <div className="dt-pagination">
                   <button
