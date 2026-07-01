@@ -55,12 +55,21 @@ function buildHttpErrorMessage(status: number, fallback: string): string {
   return fallback;
 }
 
+// Header ini WAJIB: Node.js 22.x undici punya bug decompression gzip di dalam
+// wrapper fetch milik Next.js (`TypeError: controller[kState].transformAlgorithm
+// is not a function`). Dengan `identity`, upstream tidak mengirim gzip sehingga
+// bug tidak pernah dieksekusi. Payload API ~4.4KB, overhead tidak signifikan.
+const SAFE_FETCH_HEADERS = {
+  "Accept": "application/json",
+  "Accept-Encoding": "identity",
+};
+
 function buildFetchInit(options?: ApiFetchOptions): RequestInit & { next?: { revalidate: number } } {
   if (typeof options?.revalidate === "number") {
-    return { next: { revalidate: options.revalidate } };
+    return { next: { revalidate: options.revalidate }, headers: SAFE_FETCH_HEADERS };
   }
 
-  return { cache: options?.cache ?? "no-store" };
+  return { cache: options?.cache ?? "no-store", headers: SAFE_FETCH_HEADERS };
 }
 
 export async function getSummaryData(
